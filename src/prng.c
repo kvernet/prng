@@ -1,4 +1,5 @@
 #include "prng.h"
+#include "mtwister.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,32 +8,35 @@
 #include <stdbool.h>
 #include <time.h>
 
-struct prng {
-    struct mim_prng pub;    
+typedef struct wprng {
+    prng pub;    
     const double weight;    /* Monte Carlo weight */
-};
+}wprng;
 
-static double uniform1(struct mim_prng * prng);
-static double normal(struct mim_prng * prng,
+static double uniform1(prng * prng);
+static double uniform2(prng * prng);
+static double uniform3(prng * prng);
+static double normal(prng * prng,
         const double mu, const double sigma);
-static double poisson(struct mim_prng * prng,
+static double poisson(prng * prng,
         const double lambda);
-static double weight(struct mim_prng * prng);
+static double weight(prng * prng);
 
-static void set_seed(struct mim_prng * prng, const unsigned long s) {
+static void set_seed(prng * prng,
+        const unsigned long s) {
     *(unsigned long*)&prng->seed = s;
-    /* Set seed */
-    srand(prng->seed);
+    /* set seed */
+    init_genrand(s);
 }
 
-static void mim_prng_destroy(struct mim_prng ** self_ptr) {
-    if(self_ptr == NULL || *self_ptr == NULL) return;
+static void mim_prng_destroy(prng ** self_ptr) {
+    if(*self_ptr == NULL) return;
     free(*self_ptr);
     self_ptr = NULL;
 }
 
-struct mim_prng * mim_prng_init(const unsigned long seed) {
-    struct prng * prng = malloc(sizeof(*prng));
+prng * mim_prng_init(const unsigned long seed) {
+    wprng * prng = malloc(sizeof(*prng));
     
     if(seed > 0) {
         *(unsigned long*)&prng->pub.seed = seed;
@@ -53,30 +57,43 @@ struct mim_prng * mim_prng_init(const unsigned long seed) {
     prng->pub.destroy = &mim_prng_destroy;
     
     prng->pub.uniform1 = &uniform1;
+    prng->pub.uniform2 = &uniform2;
+    prng->pub.uniform3 = &uniform3;
     prng->pub.normal = &normal;
     prng->pub.poisson = &poisson;
     prng->pub.weight = &weight;    
     
-    /* Default weight */
+    /* default weight */
     *(double*)&prng->weight = 1.;
     
     /* Set seed */
-    srand(prng->pub.seed);
+    init_genrand(prng->pub.seed);
     
     return &prng->pub;
 }
 
 
-
-static double uniform1(struct mim_prng * prng) {
-    struct prng * p = (void*)prng;
+static double uniform1(prng * prng) {
+    wprng * p = (void*)prng;
     *(double*)&p->weight = 1;
-    return (double)rand() / (double)RAND_MAX;
+    return genrand_real1();
 }
 
-double normal(struct mim_prng * prng,
+static double uniform2(prng * prng) {
+    wprng * p = (void*)prng;
+    *(double*)&p->weight = 1;
+    return genrand_real2();
+}
+
+static double uniform3(prng * prng) {
+    wprng * p = (void*)prng;
+    *(double*)&p->weight = 1;
+    return genrand_real3();
+}
+
+double normal(prng * prng,
         const double mu, const double sigma) {
-    struct prng * p = (void*)prng;
+    wprng * p = (void*)prng;
     
     if(sigma == 0) {
         *(double*)&p->weight = 1.;
@@ -100,11 +117,11 @@ double normal(struct mim_prng * prng,
 	return x;
 }
 
-static double poisson_knuth(struct mim_prng * prng,
+static double poisson_knuth(prng * prng,
         const double lambda);
-static double poisson_cook(struct mim_prng * prng,
+static double poisson_cook(prng * prng,
         const double lambda);
-double poisson(struct mim_prng * prng,
+double poisson(prng * prng,
         const double lambda) {
     if(isnan(lambda)) return lambda;
     if(fabs(lambda) >= DBL_MAX) return DBL_MAX;
@@ -112,8 +129,8 @@ double poisson(struct mim_prng * prng,
     else return poisson_cook(prng, lambda);
 }
 
-static double weight(struct mim_prng * prng) {
-    struct prng * p = (void*)prng;
+static double weight(prng * prng) {
+    wprng * p = (void*)prng;
     return p->weight;
 }
 
@@ -134,9 +151,9 @@ double compute_poisson_weight(const double lambda,
 }
 
 // algorithm https://fr.wikipedia.org/wiki/Loi_de_Poisson
-double poisson_knuth(struct mim_prng * prng,
+double poisson_knuth(prng * prng,
         const double lambda) {
-    struct prng * rng = (void*)prng;
+    wprng * rng = (void*)prng;
     
     double p = 1;
     long long k = 0;
@@ -157,9 +174,9 @@ double poisson_knuth(struct mim_prng * prng,
     return x;
 }
 // reference: https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/
-double poisson_cook(struct mim_prng * prng,
+double poisson_cook(prng * prng,
         const double lambda) {
-    struct prng * rng = (void*)prng;
+    wprng * rng = (void*)prng;
     
     const double c = 0.767 - 3.36 / lambda;
     const double beta = M_PI / sqrt(3.0 * lambda);

@@ -18,9 +18,14 @@ $(LIB_NAME): $(LIB_OBJ)
 %.o: %.c
 	$(COMPILER) $(CFLAGS) -c $< -o $@ -Iinclude
 
+define build_example
+	$(COMPILER) $(CFLAGS) -o bin/example-$(1) examples/$(1).c -Iinclude -Llib -l$(LIB_NAME) -Wl,-rpath=`pwd`/lib
+endef
+
 examples: $(LIB_NAME)
 	mkdir -p bin
-	$(COMPILER) $(CFLAGS) -o bin/example-twister examples/twister.c -Iinclude -Llib -l$(LIB_NAME) -Wl,-rpath=`pwd`/lib
+	$(call build_example,twister)
+	$(call build_example,uniform)
 
 clean:
 	rm -rf bin
