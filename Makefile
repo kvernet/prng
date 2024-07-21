@@ -26,6 +26,7 @@ examples: $(LIB_NAME)
 	mkdir -p bin
 	$(call build_example,twister)
 	$(call build_example,uniform)
+	$(call build_example,normal)
 
 clean:
 	rm -rf bin
