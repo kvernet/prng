@@ -27,6 +27,7 @@ examples: $(LIB_NAME)
 	$(call build_example,twister)
 	$(call build_example,uniform)
 	$(call build_example,normal)
+	$(call build_example,poisson)
 
 clean:
 	rm -rf bin
