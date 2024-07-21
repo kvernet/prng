@@ -4,18 +4,19 @@ LDFLAGS   =-shared
 
 LIB_NAME  =prng
 
-LIB_SRCS  =mtwister.c
+LIB_SRCS  =src/mtwister.c \
+           src/prng.c
+
 LIB_OBJ   =$(LIB_SRCS:.c=.o)
 
 all: $(LIB_NAME)
 
 $(LIB_NAME): $(LIB_OBJ)
 	mkdir -p lib
-	$(COMPILER) $(LDFLAGS) -o lib/lib$@.so obj/$^ -Iinclude
+	$(COMPILER) $(LDFLAGS) -o lib/lib$@.so $^ -Iinclude -lm
 
-%.o: src/%.c
-	mkdir -p obj
-	$(COMPILER) $(CFLAGS) -c $< -o obj/$@ -Iinclude
+%.o: %.c
+	$(COMPILER) $(CFLAGS) -c $< -o $@ -Iinclude
 
 examples: $(LIB_NAME)
 	mkdir -p bin
@@ -24,6 +25,6 @@ examples: $(LIB_NAME)
 clean:
 	rm -rf bin
 	rm -rf lib
-	rm -rf obj
+	rm -f src/*.o
 
 .PHONY: all clean examples $(LIB_NAME)

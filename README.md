@@ -3,10 +3,13 @@
 ## Initialization
 Two functions can be used to initialize the generator :
 1. with a seed
+
 ```c
 init_genrand(uint32_t s);
 ```
+
 2. with an array of seeds
+
 ```c
 init_by_array(uint32_t init_key[], int key_length);
 ```
