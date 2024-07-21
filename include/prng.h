@@ -14,6 +14,7 @@ struct prng {
             const unsigned long s);
     void (*destroy)(prng ** self_ptr);
     
+    unsigned long (*randint)(prng * prng);
     double (*uniform1)(prng * prng);
     double (*uniform2)(prng * prng);
     double (*uniform3)(prng * prng);

@@ -13,6 +13,7 @@ typedef struct wprng {
     const double weight;    /* Monte Carlo weight */
 }wprng;
 
+static unsigned long randint(prng * prng);
 static double uniform1(prng * prng);
 static double uniform2(prng * prng);
 static double uniform3(prng * prng);
@@ -56,6 +57,7 @@ prng * mim_prng_init(const unsigned long seed) {
     prng->pub.set_seed = &set_seed;
     prng->pub.destroy = &mim_prng_destroy;
     
+    prng->pub.randint = &randint;
     prng->pub.uniform1 = &uniform1;
     prng->pub.uniform2 = &uniform2;
     prng->pub.uniform3 = &uniform3;
@@ -72,6 +74,12 @@ prng * mim_prng_init(const unsigned long seed) {
     return &prng->pub;
 }
 
+
+static unsigned long randint(prng * prng) {
+	wprng * p = (void*)prng;
+    *(double*)&p->weight = 1;
+    return genrand_int32();
+}
 
 static double uniform1(prng * prng) {
     wprng * p = (void*)prng;
