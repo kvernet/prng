@@ -22,7 +22,7 @@ struct prng {
             const double mu, const double sigma);
     double (*poisson)(prng * prng,
             const double lambda);
-    double (*weight)(prng * prng);    
+    double (*weight)(prng * prng);
 };
 
 prng * mim_prng_init(const unsigned long seed);
