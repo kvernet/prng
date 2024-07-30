@@ -30,13 +30,13 @@ static void set_seed(prng * prng,
     init_genrand(s);
 }
 
-static void mim_prng_destroy(prng ** self_ptr) {
+static void prng_destroy(prng ** self_ptr) {
     if(*self_ptr == NULL) return;
     free(*self_ptr);
     self_ptr = NULL;
 }
 
-prng * mim_prng_init(const unsigned long seed) {
+prng * prng_init(const unsigned long seed) {
     wprng * prng = malloc(sizeof(*prng));
     
     if(seed > 0) {
@@ -55,7 +55,7 @@ prng * mim_prng_init(const unsigned long seed) {
     }
     
     prng->pub.set_seed = &set_seed;
-    prng->pub.destroy = &mim_prng_destroy;
+    prng->pub.destroy = &prng_destroy;
     
     prng->pub.randint = &randint;
     prng->pub.uniform1 = &uniform1;

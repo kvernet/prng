@@ -13,7 +13,7 @@ int main(int argc, char ** argv) {
 	const double lambda = strtod(argv[1], NULL);
 	const long n = atol(argv[2]);
 	
-	prng * prng = mim_prng_init(0);
+	prng * prng = prng_init(0);
 	
 	long i;
 	for(i = 0; i < n; i++) {

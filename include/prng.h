@@ -25,7 +25,7 @@ struct prng {
     double (*weight)(prng * prng);
 };
 
-prng * mim_prng_init(const unsigned long seed);
+prng * prng_init(const unsigned long seed);
 
 #ifdef __cplusplus
 }

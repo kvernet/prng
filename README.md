@@ -1,12 +1,13 @@
 # Pseudo Random Number Generator (PRNG)
 
+# Description
 A unique function can be used to initialize the generator
 
 ```c
-prng * mim_prng_init(const unsigned long seed);
+prng * prng_init(const unsigned long seed);
 ```
 
-It takes a seed as argument and returns a pointer of struct prng as bellow
+It takes a seed as argument and returns a pointer of struct prng defined as bellow
 
 ```c
 struct prng {
@@ -52,13 +53,43 @@ double (*normal)(prng * prng,
 ```c
 double (*poisson)(prng * prng,
             const double lambda);
-    double (*weight)(prng * prng);
 ```
 
 _N.B: Two algorithms are used to get a poisson number depending of the value of the parameter $\lambda$. So, if $\lambda \lt 30$ then the knuth algorithm is used (see https://fr.wikipedia.org/wiki/Loi_de_Poisson) else the cook one is used (see https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/)._
+
+- The _weight_ function to get the weight of the last distribution that is used
+
+```c
+double (*weight)(prng * prng);
+```
 
 - The _destroy_ function to free allocated memory from the created prng.
 
 ```c
 void (*destroy)(prng ** self_ptr);
+```
+
+# Structure
+The repository contains the following files and folders
+![This is an alt text.](img/structure.png "This is a sample image.")
+
+# Build
+To build the _prng_ library, execute in the terminal, in the main directory, the following
+
+```bash
+make prng
+```
+
+# Examples
+The directory _examples_ contains different examples. To compile these examples, execute in the terminal the following
+
+```bash
+make examples
+```
+
+# Clean
+As usual, use the following to clean up the build
+
+```bash
+make clean
 ```

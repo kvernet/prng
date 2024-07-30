@@ -12,7 +12,7 @@ int main(int argc, char ** argv) {
 	
 	const int n = atoi(argv[1]);
 	
-	prng * prng = mim_prng_init(0);
+	prng * prng = prng_init(0);
 	
 	int i;
 	for(i = 0; i < n; i++) {
